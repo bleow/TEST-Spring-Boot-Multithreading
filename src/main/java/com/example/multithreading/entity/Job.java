@@ -11,4 +11,5 @@ public class Job {
     private String jobName;
     private LocalDateTime jobDate;
     private Stats jobStats;
+    private JobType jobType;
 }

@@ -1,7 +1,7 @@
 package com.example.multithreading.entity;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -11,7 +11,11 @@ import java.util.concurrent.atomic.AtomicReference;
 @Document("Telemetry")
 @Data
 @Builder
+@AllArgsConstructor
 public class Telemetry {
+    @Id
+    private String id;
+
     private final AtomicReference<Stats> totalStats = new AtomicReference<>();
     private final AtomicReference<String> current = new AtomicReference<>();
     private final List<Job> completedJobs = new CopyOnWriteArrayList<>();
@@ -20,7 +24,6 @@ public class Telemetry {
     public Stats getTotalStats() {
         return totalStats.get();
     }
-
     public void setTotalStats(Stats stats) {
         totalStats.set(stats);
     }
@@ -29,7 +32,6 @@ public class Telemetry {
     public String getCurrent() {
         return current.get();
     }
-
     public void setCurrent(String value) {
         current.set(value);
     }
@@ -38,11 +40,9 @@ public class Telemetry {
     public void addCompletedJob(Job job) {
         completedJobs.add(job);
     }
-
     public List<Job> getCompletedJobs() {
         return List.copyOf(completedJobs); // immutable copy
     }
-
     public void clearCompletedJobs() {
         completedJobs.clear();
     }
