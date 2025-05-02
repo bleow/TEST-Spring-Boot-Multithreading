@@ -18,7 +18,6 @@ public class SharedTelemetry {
 
     @Builder.Default
     private final AtomicReference<TelemetryProgress> totalProgress = new AtomicReference<>(new TelemetryProgress());
-
     //thread-safe
     public void incrementTotalProgress() {
         this.totalProgress.get().incrementProgress();

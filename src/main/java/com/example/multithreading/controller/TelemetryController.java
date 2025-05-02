@@ -1,6 +1,7 @@
 package com.example.multithreading.controller;
 
 import com.example.multithreading.entity.SharedTelemetry;
+import com.example.multithreading.entity.TelemetryProgress;
 import com.example.multithreading.repository.TelemetryRepository;
 import com.example.multithreading.service.TelemetryService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/api/telemetry")
@@ -30,7 +32,7 @@ public class TelemetryController {
     }
 
     @GetMapping
-    public int testIncrementThreadSafety() throws InterruptedException {
+    public TelemetryProgress testIncrementThreadSafety() throws InterruptedException {
         Random rand = new Random();
 
         int THREAD_COUNT = rand.nextInt(100);
@@ -58,6 +60,14 @@ public class TelemetryController {
             throw new IllegalStateException("Thread safety violated: expected " + expectedResult + ", got " + actualResult);
         }
 
-        return actualResult;
+        //both of these work
+        return TelemetryProgress.builder()
+                .current(new AtomicInteger(actualResult))
+                .total(new AtomicInteger(expectedResult))
+                .build();
+//        TelemetryProgress res = new TelemetryProgress();
+//        res.setCurrent(actualResult);
+//        res.setTotal(expectedResult);
+//        return res;
     }
 }
