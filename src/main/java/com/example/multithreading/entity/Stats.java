@@ -10,10 +10,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 @AllArgsConstructor
 @Builder
 public class Stats {
-    private AtomicInteger files_deleted = new AtomicInteger();
-    private AtomicInteger files_added = new AtomicInteger();
-    private AtomicInteger folders_deleted = new AtomicInteger();
-    private AtomicInteger folders_added = new AtomicInteger();
+    @Builder.Default
+    private AtomicInteger files_deleted = new AtomicInteger(0);
+
+    @Builder.Default
+    private AtomicInteger files_added = new AtomicInteger(0);
+
+    @Builder.Default
+    private AtomicInteger folders_deleted = new AtomicInteger(0);
+
+    @Builder.Default
+    private AtomicInteger folders_added = new AtomicInteger(0);
 
     // Atomic setters
     public void setFilesDeleted(int value) {

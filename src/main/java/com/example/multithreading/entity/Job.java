@@ -8,8 +8,15 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class Job {
-    private String jobName;
-    private LocalDateTime jobDate;
-    private Stats jobStats;
+
+    @Builder.Default
+    private String jobName = "foo";
+
+    @Builder.Default
+    private LocalDateTime jobDate = LocalDateTime.now();
+
+    @Builder.Default
+    private Stats jobStats = Stats.builder().build();
+
     private JobType jobType;
 }
