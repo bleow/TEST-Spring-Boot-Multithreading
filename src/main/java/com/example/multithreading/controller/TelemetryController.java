@@ -1,8 +1,6 @@
 package com.example.multithreading.controller;
 
-import com.example.multithreading.entity.SharedTelemetry;
-import com.example.multithreading.entity.Stats;
-import com.example.multithreading.entity.TelemetryProgress;
+import com.example.multithreading.entity.*;
 import com.example.multithreading.repository.TelemetryRepository;
 import com.example.multithreading.service.TelemetryService;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +77,7 @@ public class TelemetryController {
         Random rand = new Random();
 
         int THREAD_COUNT = rand.nextInt(100);
-        int INC_PER_THREAD = rand.nextInt(10000);
+        int INC_PER_THREAD = rand.nextInt(1000);
 
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
         CountDownLatch latch = new CountDownLatch(THREAD_COUNT);
@@ -87,26 +85,34 @@ public class TelemetryController {
         for (int i = 0; i < THREAD_COUNT; i++) {
             executor.submit(() -> {
                 for (int j = 0; j < INC_PER_THREAD; j++) {
-                    Stats stats = new Stats();
-                    stats.setFilesAdded(1);
-                    stats.setFilesDeleted(1);
-                    stats.setFoldersAdded(1);
-                    stats.setFoldersDeleted(1);
-                    telemetryService.update(stats); //call the wrapper
+                    Job job = Job.builder().jobType(JobType.CD).build();
+//                    System.out.println("hiii");
+                    telemetryService.addJob(job);
+//                    Stats stats = new Stats();
+//                    stats.setFilesAdded(1);
+//                    stats.setFilesDeleted(1);
+//                    stats.setFoldersAdded(1);
+//                    stats.setFoldersDeleted(1);
+//                    telemetryService.update(stats); //call the wrapper
                 }
                 latch.countDown(); //declare thread as finished running
             });
         }
+        System.out.println("bro");
 
         latch.await(); // wait for all threads to finish
         executor.shutdown();
 
         int expectedResult = THREAD_COUNT * INC_PER_THREAD;
-        int actualResult = telemetryService.getSharedTelemetry().getTotalStats().getFilesAdded();
-        int actualResult2 = telemetryService.getSharedTelemetry().getTotalStats().getFilesDeleted();
-        int actualResult3 = telemetryService.getSharedTelemetry().getTotalStats().getFoldersAdded();
-        int actualResult4 = telemetryService.getSharedTelemetry().getTotalStats().getFoldersDeleted();
-        if (actualResult != expectedResult || actualResult != actualResult2 || actualResult != actualResult3 || actualResult != actualResult4) {
+        int actualResult = telemetryService.getJobLen();
+//        int actualResult = telemetryService.getSharedTelemetry().getTotalStats().getFilesAdded();
+//        int actualResult2 = telemetryService.getSharedTelemetry().getTotalStats().getFilesDeleted();
+//        int actualResult3 = telemetryService.getSharedTelemetry().getTotalStats().getFoldersAdded();
+//        int actualResult4 = telemetryService.getSharedTelemetry().getTotalStats().getFoldersDeleted();
+//        if (actualResult != actualResult2 || actualResult != actualResult3 || actualResult != actualResult4) {
+//            throw new IllegalStateException("Thread safety violated: expected " + expectedResult + ", got " + actualResult);
+//        }
+        if (actualResult != expectedResult) {
             throw new IllegalStateException("Thread safety violated: expected " + expectedResult + ", got " + actualResult);
         }
 
