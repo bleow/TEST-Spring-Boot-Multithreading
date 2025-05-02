@@ -1,11 +1,16 @@
 package com.example.multithreading.controller;
 
-import com.example.multithreading.entity.Telemetry;
+import com.example.multithreading.entity.SharedTelemetry;
 import com.example.multithreading.repository.TelemetryRepository;
 import com.example.multithreading.service.TelemetryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/api/telemetry")
@@ -16,11 +21,43 @@ public class TelemetryController {
     private final TelemetryService telemetryService;
 
     @PostMapping
-    public Telemetry initialiseTelemetry() {
+    public SharedTelemetry initialiseTelemetry() {
         log.info("Saving new object");
-        Telemetry telemetry = Telemetry.builder().build();
-        Telemetry res = telemetryRepository.insert(telemetry);
+        SharedTelemetry sharedTelemetry = SharedTelemetry.builder().build();
+        SharedTelemetry res = telemetryRepository.insert(sharedTelemetry);
         log.info("Saved new object: {}", res);
         return res;
+    }
+
+    @GetMapping
+    public int testIncrementThreadSafety() throws InterruptedException {
+        Random rand = new Random();
+
+        int THREAD_COUNT = rand.nextInt(100);
+        int INC_PER_THREAD = rand.nextInt(1000);
+
+        SharedTelemetry sharedTelemetry = SharedTelemetry.builder().build();
+        ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
+        CountDownLatch latch = new CountDownLatch(THREAD_COUNT);
+
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            executor.submit(() -> {
+                for (int j = 0; j < INC_PER_THREAD; j++) {
+                    sharedTelemetry.incrementTotalProgress();
+                }
+                latch.countDown(); //declare thread as finished running
+            });
+        }
+
+        latch.await(); // wait for all threads to finish
+        executor.shutdown();
+
+        int expectedResult = THREAD_COUNT * INC_PER_THREAD;
+        int actualResult = sharedTelemetry.getTotalProgress().get().getTotal().get();
+        if (actualResult != expectedResult) {
+            throw new IllegalStateException("Thread safety violated: expected " + expectedResult + ", got " + actualResult);
+        }
+
+        return actualResult;
     }
 }

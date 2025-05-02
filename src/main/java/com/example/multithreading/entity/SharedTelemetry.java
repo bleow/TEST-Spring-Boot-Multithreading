@@ -12,9 +12,17 @@ import java.util.concurrent.atomic.AtomicReference;
 @Data
 @Builder
 @AllArgsConstructor
-public class Telemetry {
+public class SharedTelemetry {
     @Id
     private String id;
+
+    @Builder.Default
+    private final AtomicReference<TelemetryProgress> totalProgress = new AtomicReference<>(new TelemetryProgress());
+
+    //thread-safe
+    public void incrementTotalProgress() {
+        this.totalProgress.get().incrementProgress();
+    }
 
     private final AtomicReference<Stats> totalStats = new AtomicReference<>();
     private final AtomicReference<String> current = new AtomicReference<>();
