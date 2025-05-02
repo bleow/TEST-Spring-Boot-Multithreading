@@ -1,5 +1,6 @@
 package com.example.multithreading.service;
 
+import com.example.multithreading.entity.Job;
 import com.example.multithreading.entity.SharedTelemetry;
 import com.example.multithreading.entity.Stats;
 import lombok.Getter;
@@ -21,5 +22,13 @@ public class TelemetryService {
     // calls the actual atomic function
     public void update(Stats other) {
         this.sharedTelemetry.updateTotalStats(other);
+    }
+
+    public void addJob(Job job) {
+        this.sharedTelemetry.addCompletedJob(job);
+    }
+
+    public int getJobLen() {
+        return this.sharedTelemetry.getCompletedJobs().size();
     }
 }
