@@ -36,6 +36,11 @@ public class SharedTelemetry {
     @Builder.Default
     private final List<Job> completedJobs = new CopyOnWriteArrayList<>();
 
+    private final AtomicReference<ChildTelemetry> child = new AtomicReference<>(ChildTelemetry.builder().build());
+    public void addJobToChild(Job job) {
+        this.child.get().addCompletedJob(job);
+    }
+
     // totalStats
     public Stats getTotalStats() {
         return totalStats.get();

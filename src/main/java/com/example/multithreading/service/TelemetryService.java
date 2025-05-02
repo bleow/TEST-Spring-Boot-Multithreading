@@ -31,4 +31,11 @@ public class TelemetryService {
     public int getJobLen() {
         return this.sharedTelemetry.getCompletedJobs().size();
     }
+
+    public void addToChild(Job job) {
+        sharedTelemetry.addJobToChild(job);
+    }
+    public int getChildJobLen() {
+        return this.sharedTelemetry.getChild().get().getCompletedJobs();
+    }
 }

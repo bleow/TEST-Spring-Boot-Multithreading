@@ -86,8 +86,13 @@ public class TelemetryController {
             executor.submit(() -> {
                 for (int j = 0; j < INC_PER_THREAD; j++) {
                     Job job = Job.builder().jobType(JobType.CD).build();
+
+                    telemetryService.addToChild(job);
+
 //                    System.out.println("hiii");
-                    telemetryService.addJob(job);
+
+//                    telemetryService.addJob(job);
+
 //                    Stats stats = new Stats();
 //                    stats.setFilesAdded(1);
 //                    stats.setFilesDeleted(1);
@@ -104,7 +109,10 @@ public class TelemetryController {
         executor.shutdown();
 
         int expectedResult = THREAD_COUNT * INC_PER_THREAD;
-        int actualResult = telemetryService.getJobLen();
+        int actualResult = telemetryService.getChildJobLen();
+
+//        int actualResult = telemetryService.getJobLen();
+
 //        int actualResult = telemetryService.getSharedTelemetry().getTotalStats().getFilesAdded();
 //        int actualResult2 = telemetryService.getSharedTelemetry().getTotalStats().getFilesDeleted();
 //        int actualResult3 = telemetryService.getSharedTelemetry().getTotalStats().getFoldersAdded();
