@@ -23,8 +23,17 @@ public class SharedTelemetry {
         this.totalProgress.get().incrementProgress();
     }
 
-    private final AtomicReference<Stats> totalStats = new AtomicReference<>();
+    @Builder.Default
+    private final AtomicReference<Stats> totalStats = new AtomicReference<>(new Stats());
+    //thread-safe
+    public void updateTotalStats(Stats other) {
+        this.totalStats.get().sumWith(other);
+    }
+
+    @Builder.Default
     private final AtomicReference<String> current = new AtomicReference<>();
+
+    @Builder.Default
     private final List<Job> completedJobs = new CopyOnWriteArrayList<>();
 
     // totalStats

@@ -1,20 +1,59 @@
 package com.example.multithreading.entity;
 
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 
-@Data
+import java.util.concurrent.atomic.AtomicInteger;
+
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Stats {
-    private int files_deleted;
-    private int files_added;
-    private int folders_deleted;
-    private int folders_added;
+    private AtomicInteger files_deleted = new AtomicInteger();
+    private AtomicInteger files_added = new AtomicInteger();
+    private AtomicInteger folders_deleted = new AtomicInteger();
+    private AtomicInteger folders_added = new AtomicInteger();
 
+    // Atomic setters
+    public void setFilesDeleted(int value) {
+        files_deleted.set(value);
+    }
+
+    public void setFilesAdded(int value) {
+        files_added.set(value);
+    }
+
+    public void setFoldersDeleted(int value) {
+        folders_deleted.set(value);
+    }
+
+    public void setFoldersAdded(int value) {
+        folders_added.set(value);
+    }
+
+    // Atomic getters
+    public int getFilesDeleted() {
+        return files_deleted.get();
+    }
+
+    public int getFilesAdded() {
+        return files_added.get();
+    }
+
+    public int getFoldersDeleted() {
+        return folders_deleted.get();
+    }
+
+    public int getFoldersAdded() {
+        return folders_added.get();
+    }
+
+    // Thread-safe addition of another Stats object
     public void sumWith(Stats other) {
-        this.files_added += other.files_added;
-        this.files_deleted += other.files_deleted;
-        this.folders_added += other.folders_added;
-        this.folders_deleted += other.folders_deleted;
+        this.files_added.addAndGet(other.files_added.get());
+        this.files_deleted.addAndGet(other.files_deleted.get());
+        this.folders_added.addAndGet(other.folders_added.get());
+        this.folders_deleted.addAndGet(other.folders_deleted.get());
     }
 }
